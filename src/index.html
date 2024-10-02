@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="input.css" />
+    <link rel="stylesheet" href="output.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <title>ToDo List</title>
+  </head>
+  <body>
+    <div
+      id="mainContainer"
+      class="h-100vh relative top-28 w-full flex items-center justify-center font-sans"
+    >
+      <div
+        id="secondContainer"
+        class="bg-gray-600 rounded shadow p-6 m-4 lg:w-3/4 lg:max-w-lg"
+      >
+        <div id="header" class="mb-4 justify-center">
+          <h1 class="text-gray-300 text-center text-2xl">Todo List</h1>
+          <div id="inputContainer" class="mt-4">
+            <input
+              class="shadow outline-none bg-gray-600 border-2 border-gray-300 rounded w-full py-2 px-3 mr-4 font-bold text-gray-200"
+              placeholder=" Add Todo"
+              id="input"
+            />
+          </div>
+        </div>
+        <div
+          id="listContainer"
+          class="after:content-['Add_New_ToDo'] after:text-gray-800 after:text-[16px] ml-1 after:font-bold"
+        ></div>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
