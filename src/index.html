@@ -11,17 +11,28 @@
     />
     <title>ToDo List</title>
   </head>
-  <body>
+  <body class="bg-gray-900">
     <div
       id="mainContainer"
-      class="h-100vh relative top-28 w-full flex items-center justify-center font-sans"
+      class="h-100vh relative top-8 w-full flex items-center justify-center font-sans"
     >
       <div
         id="secondContainer"
-        class="bg-gray-600 rounded shadow p-6 m-4 lg:w-3/4 lg:max-w-lg"
+        class="bg-gray-700 rounded shadow p-6 m-4 lg:w-3/4 lg:max-w-lg"
       >
-        <div id="header" class="mb-4 justify-center">
-          <h1 class="text-gray-300 text-center text-2xl">Todo List</h1>
+        <div id="header" class="mb-4">
+          <div class="flex justify-end items-center gap-3">
+            <h1 class="text-gray-300 text-center text-2xl">Todo List</h1>
+            <div id="colorsContainer" class="flex gap-2">
+              <div id="colorBoxes" class="w-5 bg-black h-5 rounded-full"></div>
+              <div id="colorBoxes" class="w-5 bg-gray-600 h-5 rounded-full"></div>
+              <div id="colorBoxes" class="w-5 bg-red-600 h-5 rounded-full"></div>
+              <div id="colorBoxes" class="w-5 bg-blue-600 h-5 rounded-full"></div>
+              <div id="colorBoxes" class="w-5 bg-yellow-600 h-5 rounded-full"></div>
+              <div id="colorBoxes" class="w-5 bg-green-600 h-5 rounded-full"></div>
+              <div id="colorBoxes" class="w-5 bg-purple-600 h-5 rounded-full"></div>
+            </div>
+          </div>
           <div id="inputContainer" class="mt-4">
             <input
               class="shadow outline-none bg-gray-600 border-2 border-gray-300 rounded w-full py-2 px-3 mr-4 font-bold text-gray-200"
