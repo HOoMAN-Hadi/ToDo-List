@@ -1,15 +1,10 @@
-//گرفتن المنت های html
 let $ = document;
 const colorBoxes = $.querySelectorAll("#colorBoxes");
 let selectedColor = ""; // متغیری برای ذخیره رنگ انتخاب‌شده
-
 let addTodoInput = $.querySelector("#input");
 let listContainer = $.querySelector("#listContainer");
-let newElemDiv;
-let newElemP;
-let newElemCircleIcon;
-let newElemTrashIcon;
 let todoArray = [];
+let dragSrcEl = null; // برای ذخیره المنت در حال درگ
 
 function setArrayInLocalStorage() {
   localStorage.setItem("todos", JSON.stringify(todoArray));
@@ -17,8 +12,6 @@ function setArrayInLocalStorage() {
 
 function getTodosFromLocalStorage() {
   let savedTodos = localStorage.getItem("todos");
-
-  // چک کردن اینکه آیا داده‌ای موجود است یا خیر
   if (savedTodos) {
     todoArray = JSON.parse(savedTodos);
     todoArray.forEach((todo) => {
@@ -33,6 +26,13 @@ function createTodoElement(todo) {
   // ساخت یک div جدید با رنگ انتخاب‌شده
   let newElemDiv = document.createElement("div");
   newElemDiv.className = `grid grid-cols-8 mt-4 hover:shadow-bs2 items-center h-10 rounded px-3 ${todo.color}`;
+  newElemDiv.setAttribute("draggable", "true"); // درگ کردن فعال شود
+  newElemDiv.setAttribute("data-id", todo.id); // ذخیره id برای تودو
+
+  newElemDiv.addEventListener("dragstart", handleDragStart);
+  newElemDiv.addEventListener("dragover", handleDragOver);
+  newElemDiv.addEventListener("drop", handleDrop);
+  newElemDiv.addEventListener("dragend", handleDragEnd);
 
   let newElemP = document.createElement("p");
   newElemP.className = "col-span-6 text-gray-200 text-lg";
@@ -60,30 +60,22 @@ function createNewtodo(event) {
       color: selectedColor,
     };
     todoArray.push(newTodoObj);
-    createTodoElement(newTodoObj); // المنت جدید را ایجاد و به صفحه اضافه کنید
+    createTodoElement(newTodoObj);
     addTodoInput.value = "";
     setArrayInLocalStorage();
   }
 }
 
 function removeTodo(todoId) {
-  // حذف تودوی مربوطه از todoArray
   todoArray = todoArray.filter((todo) => todo.id !== todoId);
-
-  // ذخیره کردن آرایه به‌روزشده در localStorage
   setArrayInLocalStorage();
-
-  // پاک کردن لیست موجود در DOM
   listContainer.innerHTML = "";
-
-  // دوباره رندر کردن تمام تودوها
   todoArray.forEach((todo) => {
     createTodoElement(todo);
   });
 }
 
 function setColorForTodos(i) {
-  // حذف تمام کلاس‌های رنگی از addTodoInput
   addTodoInput.classList.remove(
     "bg-black",
     "bg-white",
@@ -94,7 +86,6 @@ function setColorForTodos(i) {
     "bg-purple-600"
   );
 
-  // تنظیم رنگ انتخاب‌شده
   if (colorBoxes[i].classList.contains("bg-black")) {
     selectedColor = "bg-black";
     addTodoInput.classList.add("bg-black");
@@ -126,47 +117,49 @@ for (let i = 0; i < colorBoxes.length; i++) {
 addTodoInput.addEventListener("keydown", createNewtodo);
 window.addEventListener("load", getTodosFromLocalStorage);
 
-// addTodoInput.addEventListener("keydown", setArrayInLocalStorage);
+// Functions for Drag and Drop
+function handleDragStart(e) {
+  dragSrcEl = this;
+  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData("text/plain", this.getAttribute("data-id"));
+  this.classList.add("dragging");
+}
 
-// //ایونت کلید اینتر و اد شدن تودو جدید
-// addTodoInput.addEventListener("keydown", function (event) {
-//   if (event.keyCode === 13) {
-//     newElemDiv = $.createElement("div");
-//     newElemDiv.className = "grid grid-cols-8 mt-4 items-center h-10";
+function handleDragOver(e) {
+  e.preventDefault();
+  return false;
+}
 
-//     newElemP = $.createElement("p");
-//     newElemP.className = "col-span-6 text-gray-200";
-//     newElemP.innerHTML = addTodoInput.value;
+function handleDrop(e) {
+  e.stopPropagation();
+  const draggedTodoId = e.dataTransfer.getData("text/plain");
+  const droppedTodoId = this.getAttribute("data-id");
 
-//     newElemCircleIcon = $.createElement("i");
-//     newElemCircleIcon.className = "fa fa-check-circle-o text-gray-300";
-//     newElemCircleIcon.style = "font-size: 20px";
+  if (draggedTodoId !== droppedTodoId) {
+    // Swap todos in the array
+    let draggedTodoIndex = todoArray.findIndex(
+      (todo) => todo.id == draggedTodoId
+    );
+    let droppedTodoIndex = todoArray.findIndex(
+      (todo) => todo.id == droppedTodoId
+    );
 
-//     //انجام دادن تودو
-//     let toggleCircleIcon = true;
-//     newElemCircleIcon.addEventListener("click", function (event) {
-//       if (toggleCircleIcon) {
-//         event.target.className = "fa fa-circle-o text-gray-300";
-//         newElemP.className = "col-span-6 line-through text-gray-200";
-//         toggleCircleIcon = false;
-//       } else {
-//         event.target.className = "fa fa-check-circle-o text-gray-300";
-//         newElemP.className = "col-span-6 text-gray-200";
-//         toggleCircleIcon = true;
-//       }
-//       console.log(event);
-//     });
-//     newElemTrashIcon = $.createElement("i");
-//     newElemTrashIcon.className = "fa fa-trash text-gray-300";
-//     newElemTrashIcon.style = "font-size: 20px";
+    [todoArray[draggedTodoIndex], todoArray[droppedTodoIndex]] = [
+      todoArray[droppedTodoIndex],
+      todoArray[draggedTodoIndex],
+    ];
 
-//     //حذف کردن تودو
-//     newElemTrashIcon.addEventListener("click", function (event) {
-//       event.target.parentElement.remove();
-//     });
+    // Clear and re-render todos
+    listContainer.innerHTML = "";
+    todoArray.forEach((todo) => {
+      createTodoElement(todo);
+    });
 
-//     newElemDiv.append(newElemP, newElemCircleIcon, newElemTrashIcon);
-//     listContainer.append(newElemDiv);
-//     addTodoInput.value = "";
-//   }
-// });
+    setArrayInLocalStorage(); // ذخیره آرایه به‌روزشده
+  }
+  return false;
+}
+
+function handleDragEnd() {
+  this.classList.remove("dragging");
+}
