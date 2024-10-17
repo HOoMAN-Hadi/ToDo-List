@@ -38,17 +38,53 @@ function createTodoElement(todo) {
   newElemP.className = "col-span-6 text-gray-200 text-lg";
   newElemP.innerHTML = todo.title;
 
-  let newElemCircleIcon = document.createElement("i");
-  newElemCircleIcon.className = "fa fa-check-circle-o text-gray-300";
+  // اضافه کردن کلاس line-through اگر complete باشد
+  if (todo.complete) {
+    newElemP.classList.add("line-through");
+  }
+
+  let newElemCircleIcon = document.createElement("button");
+  newElemCircleIcon.className = todo.complete
+    ? "fa fa-check-circle-o text-green-300"
+    : "fa fa-circle-o text-gray-300";
   newElemCircleIcon.style = "font-size: 20px";
+
+  // افزودن event listener برای تغییر وضعیت و کلاس‌ها
+  newElemCircleIcon.addEventListener("click", function () {
+    editTodo(todo.id, newElemCircleIcon, newElemP);
+  });
 
   let newElemTrashIcon = document.createElement("button");
   newElemTrashIcon.className = "fa fa-trash text-gray-300";
   newElemTrashIcon.style = "font-size: 20px";
-  newElemTrashIcon.setAttribute("onclick", "removeTodo(" + todo.id + ")");
+  newElemTrashIcon.addEventListener("click", function () {
+    removeTodo(todo.id);
+  });
 
   newElemDiv.append(newElemP, newElemCircleIcon, newElemTrashIcon);
   listContainer.append(newElemDiv);
+}
+
+// تغییر دادن وضعیت complete و به‌روزرسانی کلاس آیکون و p
+function editTodo(todoId, iconElement, textElement) {
+  todoArray.forEach(function (todo) {
+    if (todo.id === todoId) {
+      todo.complete = !todo.complete;
+
+      // تغییر کلاس آیکون بر اساس مقدار complete
+      if (todo.complete) {
+        iconElement.classList.replace("fa-circle-o", "fa-check-circle-o");
+        iconElement.classList.replace("text-gray-300", "text-green-300");
+      } else {
+        iconElement.classList.replace("fa-check-circle-o", "fa-circle-o");
+        iconElement.classList.replace("text-green-300", "text-gray-300");
+      }
+
+      // اضافه/حذف کردن کلاس line-through به عنصر <p>
+      textElement.classList.toggle("line-through");
+    }
+  });
+  setArrayInLocalStorage();
 }
 
 function createNewtodo(event) {
@@ -56,7 +92,7 @@ function createNewtodo(event) {
     let newTodoObj = {
       id: todoArray.length + 1,
       title: addTodoInput.value,
-      compelete: false,
+      complete: false,
       color: selectedColor,
     };
     todoArray.push(newTodoObj);
@@ -77,10 +113,10 @@ function removeTodo(todoId) {
 
 function setColorForTodos(i) {
   addTodoInput.classList.remove(
-    "bg-black",
+    "bg-gray-900",
     "bg-white",
     "bg-red-600",
-    "bg-blue-600",
+    "bg-blue-700",
     "bg-yellow-600",
     "bg-green-600",
     "bg-purple-600"
@@ -88,7 +124,7 @@ function setColorForTodos(i) {
 
   if (colorBoxes[i].classList.contains("bg-black")) {
     selectedColor = "bg-black";
-    addTodoInput.classList.add("bg-black");
+    addTodoInput.classList.add("bg-gray-900");
   } else if (colorBoxes[i].classList.contains("bg-gray-600")) {
     selectedColor = "bg-gray-600";
     addTodoInput.classList.add("bg-gray-600");
@@ -97,7 +133,7 @@ function setColorForTodos(i) {
     addTodoInput.classList.add("bg-red-600");
   } else if (colorBoxes[i].classList.contains("bg-blue-600")) {
     selectedColor = "bg-blue-600";
-    addTodoInput.classList.add("bg-blue-600");
+    addTodoInput.classList.add("bg-blue-700");
   } else if (colorBoxes[i].classList.contains("bg-yellow-600")) {
     selectedColor = "bg-yellow-600";
     addTodoInput.classList.add("bg-yellow-600");
